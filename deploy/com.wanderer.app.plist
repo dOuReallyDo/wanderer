@@ -6,12 +6,12 @@
     <string>com.wanderer.app</string>
     <key>ProgramArguments</key>
     <array>
-        <string>/Volumes/HD_esterno/Progetti/Wanderer/bin/wanderer</string>
+        <string>/Users/mariocurcio/.local/bin/wanderer</string>
         <string>-port</string>
         <string>8899</string>
-    </array>
-    <key>WorkingDirectory</key>
-    <string>/Volumes/HD_esterno/Progetti/Wanderer</string>
+        </array>
+        <key>WorkingDirectory</key>
+        <string>/Users/mariocurcio/.local/share/wanderer</string>
     <key>RunAtLoad</key>
     <true/>
     <key>KeepAlive</key>
