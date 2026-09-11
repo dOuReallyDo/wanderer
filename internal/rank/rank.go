@@ -140,7 +140,7 @@ func filter(trips []models.Trip, req models.SearchRequest) []models.Trip {
 		if req.MaxDurationH > 0 && t.TotalDurMin > req.MaxDurationH*60 {
 			continue
 		}
-		// Filtro tipo transporte
+		// Filtro tipo transport
 		if req.PreferredTransport != "" && req.PreferredTransport != "any" {
 			match := false
 			for _, tr := range t.Transport {
@@ -152,6 +152,16 @@ func filter(trips []models.Trip, req models.SearchRequest) []models.Trip {
 				match = len(t.Transport) > 1
 			}
 			if !match {
+				continue
+			}
+		}
+		// Filtro orario partenza (hard filter)
+		if req.EarliestDepart != "" && req.LatestDepart != "" && len(t.Segments) > 0 {
+			dep := t.Segments[0].Departure
+			depHM, _ := time.Parse("15:04", dep.Format("15:04"))
+			eh, _ := time.Parse("15:04", req.EarliestDepart)
+			lh, _ := time.Parse("15:04", req.LatestDepart)
+			if depHM.Before(eh) || depHM.After(lh) {
 				continue
 			}
 		}
