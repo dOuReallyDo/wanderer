@@ -206,6 +206,25 @@ h1 {
   .trip-card { flex-direction: column; align-items: flex-start; gap: 12px; }
   .trip-right { text-align: left; margin-left: 0; }
 }
+.suggest {
+  position: relative;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s;
+}
+.suggest.show { max-height: 200px; overflow-y: auto; }
+.suggest-item {
+  padding: 8px 12px;
+  background: #0d0d14;
+  border: 1px solid var(--border);
+  border-top: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  border-radius: 0 0 6px 6px;
+}
+.suggest-item:hover { background: var(--accent); color: white; }
+.suggest-item .code { font-weight: 700; color: var(--accent2); margin-right: 8px; }
+.suggest-item:hover .code { color: white; }
 </style>
 </head>
 <body>
@@ -219,11 +238,13 @@ h1 {
     <div class="form-grid">
       <div class="form-group">
         <label>Origine (IATA)</label>
-        <input type="text" id="origin" placeholder="es. MIL (Milano)">
+        <input type="text" id="origin" placeholder="es. MIL (Milano)" autocomplete="off" oninput="suggestCity(this,'origin-suggest')">
+        <div class="suggest" id="origin-suggest"></div>
       </div>
       <div class="form-group">
         <label>Destinazione (IATA)</label>
-        <input type="text" id="destination" placeholder="es. PAR (Parigi)">
+        <input type="text" id="destination" placeholder="es. PAR (Parigi)" autocomplete="off" oninput="suggestCity(this,'dest-suggest')">
+        <div class="suggest" id="dest-suggest"></div>
       </div>
       <div class="form-group">
         <label>Data andata</label>
@@ -278,8 +299,34 @@ h1 {
 function toggleAdvanced() {
   document.getElementById('advanced').classList.toggle('show');
 }
-function toggleAdvancedGrid() {
-  // hack to make advanced grid work
+
+// Autocomplete città/aeroporti
+let suggestTimer = null;
+function suggestCity(input, suggestId) {
+  clearTimeout(suggestTimer);
+  const q = input.value.trim();
+  const div = document.getElementById(suggestId);
+  if (q.length < 2) { div.classList.remove('show'); div.innerHTML = ''; return; }
+  suggestTimer = setTimeout(async () => {
+    try {
+      const resp = await fetch('/api/cities?q=' + encodeURIComponent(q));
+      const data = await resp.json();
+      div.innerHTML = '';
+      (data.cities || []).forEach(c => {
+        const item = document.createElement('div');
+        item.className = 'suggest-item';
+        item.innerHTML = '<span class="code">' + c.code + '</span>' + c.name + ' <small style="color:var(--muted)">' + c.country + '</small>';
+        item.onclick = () => {
+          input.value = c.code;
+          div.classList.remove('show');
+          div.innerHTML = '';
+        };
+        div.appendChild(item);
+      });
+      if (div.children.length > 0) div.classList.add('show');
+      else div.classList.remove('show');
+    } catch(e) { /* silent */ }
+  }, 200);
 }
 
 async function doSearch() {

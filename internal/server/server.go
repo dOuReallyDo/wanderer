@@ -32,6 +32,7 @@ func (s *Server) routes() {
 	s.mux.HandleFunc("/api/search", s.handleSearch)
 	s.mux.HandleFunc("/api/health", s.handleHealth)
 	s.mux.HandleFunc("/api/weights", s.handleWeights)
+	s.mux.HandleFunc("/api/cities", s.handleCities)
 
 	// Static UI (embedded)
 	s.mux.Handle("/", http.FileServerFS(staticFS))
@@ -110,6 +111,18 @@ func (s *Server) handleWeights(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	json.NewEncoder(w).Encode(w2)
+}
+
+func (s *Server) handleCities(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	q := r.URL.Query().Get("q")
+	cities := models.SearchCities(q)
+	json.NewEncoder(w).Encode(map[string]any{
+		"query":  q,
+		"count":  len(cities),
+		"cities": cities,
+	})
 }
 
 func writeError(w http.ResponseWriter, code int, msg string) {

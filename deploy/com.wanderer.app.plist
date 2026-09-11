@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.wanderer.app</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Volumes/HD_esterno/Progetti/Wanderer/bin/wanderer</string>
+        <string>-port</string>
+        <string>8899</string>
+    </array>
+    <key>WorkingDirectory</key>
+    <string>/Volumes/HD_esterno/Progetti/Wanderer</string>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>/tmp/wanderer.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/wanderer.err</string>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>AMADEUS_API_KEY</key>
+        <string>${AMADEUS_API_KEY}</string>
+        <key>AMADEUS_API_SECRET</key>
+        <string>${AMADEUS_API_SECRET</string>
+        <key>TEQUILA_API_KEY</key>
+        <string>${TEQUILA_API_KEY}</string>
+    </dict>
+</dict>
+</plist>
