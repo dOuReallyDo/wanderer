@@ -1,0 +1,18 @@
+# Binaries
+bin/
+wanderer
+*.exe
+
+# Env
+.env
+*.env.local
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# Logs
+*.log

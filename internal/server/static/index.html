@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Wanderer — Ricerca Itinerari</title>
+<style>
+:root {
+  --bg: #0a0a0f;
+  --card: #15151e;
+  --border: #2a2a3a;
+  --text: #e8e8f0;
+  --muted: #8888a0;
+  --accent: #6c5ce7;
+  --accent2: #00cec9;
+  --good: #00b894;
+  --warn: #fdcb6e;
+  --bad: #e17055;
+  --radius: 14px;
+  --safe-top: env(safe-area-inset-top, 0px);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding-top: var(--safe-top);
+}
+.container { max-width: 960px; margin: 0 auto; padding: 20px; }
+header { text-align: center; margin-bottom: 28px; }
+h1 {
+  font-size: 2.2rem;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.subtitle { color: var(--muted); margin-top: 4px; font-size: 0.95rem; }
+.search-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.form-group { display: flex; flex-direction: column; }
+.form-group label {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.form-group input, .form-group select {
+  background: #0d0d14;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--text);
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.form-group input:focus, .form-group select:focus { border-color: var(--accent); }
+.form-group input::placeholder { color: #555568; }
+.btn-search {
+  grid-column: 1 / -1;
+  margin-top: 8px;
+  padding: 13px;
+  background: linear-gradient(135deg, var(--accent), #5a4bd1);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s, opacity 0.2s;
+}
+.btn-search:hover { opacity: 0.92; }
+.btn-search:active { transform: scale(0.98); }
+.btn-search:disabled { opacity: 0.5; cursor: wait; }
+.advanced-toggle {
+  grid-column: 1 / -1;
+  color: var(--accent2);
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-align: right;
+  user-select: none;
+}
+.advanced { display: none; }
+.advanced.show { display: flex; flex-direction: column; gap: 14px; }
+.results { display: flex; flex-direction: column; gap: 14px; }
+.trip-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: border-color 0.2s, transform 0.15s;
+}
+.trip-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+.trip-card.best { border-color: var(--good); box-shadow: 0 0 20px rgba(0,184,148,0.15); }
+.trip-left { flex: 1; }
+.trip-route {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.trip-meta {
+  color: var(--muted);
+  font-size: 0.85rem;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.trip-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.tag-flight { background: rgba(108,92,231,0.2); color: var(--accent); }
+.tag-train { background: rgba(0,206,201,0.2); color: var(--accent2); }
+.tag-mixed { background: rgba(253,203,110,0.2); color: var(--warn); }
+.trip-right { text-align: right; margin-left: 16px; }
+.trip-price {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--good);
+}
+.trip-score {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.score-bar {
+  width: 60px;
+  height: 5px;
+  background: var(--border);
+  border-radius: 3px;
+  margin-top: 4px;
+  overflow: hidden;
+}
+.score-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--good));
+  border-radius: 3px;
+}
+.book-btn {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 6px 14px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+.book-btn:hover { opacity: 0.88; }
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: var(--muted);
+}
+.spinner {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.empty { text-align: center; color: var(--muted); padding: 40px; }
+.error {
+  text-align: center;
+  color: var(--bad);
+  padding: 20px;
+  background: rgba(225,112,85,0.1);
+  border-radius: 10px;
+}
+.badge-best {
+  display: inline-block;
+  background: var(--good);
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+@media (max-width: 600px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .trip-card { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .trip-right { text-align: left; margin-left: 0; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🌍 Wanderer</h1>
+    <p class="subtitle">Ricerca itinerari reali — volo e treno, con Wander Score</p>
+  </header>
+
+  <div class="search-card">
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Origine (IATA)</label>
+        <input type="text" id="origin" placeholder="es. MIL (Milano)">
+      </div>
+      <div class="form-group">
+        <label>Destinazione (IATA)</label>
+        <input type="text" id="destination" placeholder="es. PAR (Parigi)">
+      </div>
+      <div class="form-group">
+        <label>Data andata</label>
+        <input type="date" id="date">
+      </div>
+      <div class="form-group">
+        <label>Data ritorno (opz.)</label>
+        <input type="date" id="return_date">
+      </div>
+      <div class="advanced-toggle" onclick="toggleAdvanced()">⚙️ Filtri avanzati</div>
+      <div class="advanced" id="advanced">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Prezzo max (EUR)</label>
+            <input type="number" id="max_price" placeholder="500">
+          </div>
+          <div class="form-group">
+            <label>Durata max (ore)</label>
+            <input type="number" id="max_duration_h" placeholder="10">
+          </div>
+          <div class="form-group">
+            <label>Partenza min</label>
+            <input type="time" id="earliest_depart">
+          </div>
+          <div class="form-group">
+            <label>Partenza max</label>
+            <input type="time" id="latest_depart">
+          </div>
+          <div class="form-group">
+            <label>Trasporto preferito</label>
+            <select id="preferred_transport">
+              <option value="">Qualsiasi</option>
+              <option value="flight">Solo volo</option>
+              <option value="train">Solo treno</option>
+              <option value="mixed">Misto</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Passeggeri</label>
+            <input type="number" id="adults" value="1" min="1">
+          </div>
+        </div>
+      </div>
+      <button class="btn-search" id="searchBtn" onclick="doSearch()">🔍 Cerca itinerari</button>
+    </div>
+  </div>
+
+  <div id="results"></div>
+</div>
+
+<script>
+function toggleAdvanced() {
+  document.getElementById('advanced').classList.toggle('show');
+}
+function toggleAdvancedGrid() {
+  // hack to make advanced grid work
+}
+
+async function doSearch() {
+  const btn = document.getElementById('searchBtn');
+  const resultsDiv = document.getElementById('results');
+  btn.disabled = true;
+  btn.textContent = '⏳ Ricerca in corso...';
+  resultsDiv.innerHTML = '<div class="loading"><div class="spinner"></div><p style="margin-top:12px">Interrogando provider...</p></div>';
+
+  const params = new URLSearchParams();
+  const fields = ['origin','destination','date','return_date','max_price','max_duration_h','earliest_depart','latest_depart','preferred_transport','adults'];
+  fields.forEach(f => {
+    const el = document.getElementById(f);
+    if (el && el.value) params.set(f, el.value);
+  });
+
+  try {
+    const resp = await fetch('/api/search?' + params.toString());
+    const data = await resp.json();
+    if (data.error) {
+      resultsDiv.innerHTML = '<div class="error">❌ ' + data.error + '</div>';
+      return;
+    }
+    renderResults(data);
+  } catch (e) {
+    resultsDiv.innerHTML = '<div class="error">❌ Errore: ' + e.message + '</div>';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🔍 Cerca itinerari';
+  }
+}
+
+function renderResults(data) {
+  const div = document.getElementById('results');
+  if (!data.trips || data.trips.length === 0) {
+    div.innerHTML = '<div class="empty">Nessun itinerario trovato. Prova a allargare i filtri.</div>';
+    return;
+  }
+
+  let html = '<div class="results">';
+  data.trips.forEach((trip, i) => {
+    const route = trip.segments.map(s => s.from_name || s.from_code).join(' → ') +
+      ' → ' + (trip.segments[trip.segments.length-1]?.to_name || trip.segments[trip.segments.length-1]?.to_code);
+    const depTime = trip.segments[0]?.departure?.substring(11,16) || '';
+    const arrTime = trip.segments[trip.segments.length-1]?.arrival?.substring(11,16) || '';
+    const durH = Math.floor(trip.total_duration_min / 60);
+    const durM = trip.total_duration_min % 60;
+    const transportTags = trip.transport_types.map(t => {
+      const labels = {flight:'✈️ Volo', train:'🚆 Treno', mixed:'🔄 Misto'};
+      return '<span class="trip-tag tag-'+t+'">'+(labels[t]||t)+'</span>';
+    }).join(' ');
+
+    const scorePct = Math.round(trip.score);
+    const isBest = i === 0 && trip.rank === 1;
+
+    html += '<div class="trip-card'+(isBest?' best':'')+'">'+
+      '<div class="trip-left">'+
+        (isBest ? '<div class="badge-best">⭐ MIGLIORE</div>' : '')+
+        '<div class="trip-route">'+route+'</div>'+
+        '<div class="trip-meta">'+
+          '<span>⏰ '+depTime+' → '+arrTime+'</span>'+
+          '<span>⏱️ '+durH+'h '+durM+'m</span>'+
+          '<span>'+transportTags+'</span>'+
+          '<span>📡 '+trip.source+'</span>'+
+        '</div>'+
+      '</div>'+
+      '<div class="trip-right">'+
+        '<div class="trip-price">'+trip.currency+' '+trip.total_price.toFixed(0)+'</div>'+
+        '<div class="trip-score">Wander Score: '+scorePct+'/100 (#'+trip.rank+')</div>'+
+        '<div class="score-bar"><div class="score-fill" style="width:'+scorePct+'%"></div></div>'+
+        '<a href="'+(trip.booking_url||'#')+'" target="_blank" class="book-btn">Prenota →</a>'+
+      '</div>'+
+    '</div>';
+  });
+  html += '</div>';
+
+  // Stats footer
+  html += '<p style="text-align:center;color:var(--muted);margin-top:16px;font-size:0.8rem">'+
+    data.count+' itinerari | Provider: '+(data.providers_queried||[]).join(', ')+
+    ' | '+(data.took_ms/1000).toFixed(2)+'s</p>';
+
+  div.innerHTML = html;
+}
+</script>
+</body>
+</html>
