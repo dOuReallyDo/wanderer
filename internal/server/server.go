@@ -33,6 +33,7 @@ func (s *Server) routes() {
 	s.mux.HandleFunc("/api/health", s.handleHealth)
 	s.mux.HandleFunc("/api/weights", s.handleWeights)
 	s.mux.HandleFunc("/api/cities", s.handleCities)
+	s.mux.HandleFunc("/api/places", s.handlePlaces)
 
 	// Static UI (embedded)
 	s.mux.Handle("/", http.FileServerFS(staticFS))
@@ -122,6 +123,26 @@ func (s *Server) handleCities(w http.ResponseWriter, r *http.Request) {
 		"query":  q,
 		"count":  len(cities),
 		"cities": cities,
+	})
+}
+
+// handlePlaces — autocomplete con disambiguazione e coerenza From→To.
+// Parametri: q (testo), from (codice partenza già scelto), mode (airport|station|port), limit.
+func (s *Server) handlePlaces(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Cache-Control", "public, max-age=86400")
+	pq := models.PlaceQuery{
+		Query: r.URL.Query().Get("q"),
+		Mode:  r.URL.Query().Get("mode"),
+		From:  r.URL.Query().Get("from"),
+		Limit: parseIntDefault(r.URL.Query().Get("limit"), 30),
+	}
+	places := models.SearchPlaces(pq)
+	json.NewEncoder(w).Encode(map[string]any{
+		"query":  pq.Query,
+		"count":  len(places),
+		"places": places,
 	})
 }
 

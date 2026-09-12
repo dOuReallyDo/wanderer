@@ -3,413 +3,743 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
 <title>Wanderer — Ricerca Itinerari</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #0a0a0f;
-  --card: #15151e;
-  --border: #2a2a3a;
-  --text: #e8e8f0;
-  --muted: #8888a0;
-  --accent: #6c5ce7;
-  --accent2: #00cec9;
-  --good: #00b894;
-  --warn: #fdcb6e;
-  --bad: #e17055;
-  --radius: 14px;
+  --bg: #ffffff;
+  --surface: #fbfbfb;
+  --surface-2: #f7f8f9;
+  --ink: #212121;
+  --muted: #808285;
+  --line: #e7e7e7;
+  --peach: #FFC4A3;
+  --peach-soft: #FFE6D8;
+  --navy: #04194e;
+  --navy-2: #143852;
+  --blue: #0693e3;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow-1: 0 1px 3px rgba(4,25,78,.07), 0 1px 2px rgba(4,25,78,.05);
+  --shadow-2: 0 8px 24px rgba(4,25,78,.10);
   --safe-top: env(safe-area-inset-top, 0px);
+  --header-h: 62px;
+  --tap: 44px;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
 body {
-  font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
-  background: var(--bg);
-  color: var(--text);
+  font-family: 'Open Sans', -apple-system, sans-serif;
+  background: var(--bg); color: var(--ink);
   min-height: 100vh;
+  padding-top: calc(var(--safe-top) + var(--header-h));
+}
+h1, h2, .serif, .dp-title, .price, .logo { font-family: 'DM Serif Display', serif; font-weight: 400; }
+
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0;
   padding-top: var(--safe-top);
+  background: rgba(255,255,255,.92);
+  backdrop-filter: saturate(180%) blur(14px);
+  -webkit-backdrop-filter: saturate(180%) blur(14px);
+  border-bottom: 1px solid var(--line);
+  z-index: 100; height: var(--header-h);
+  display: flex; align-items: center;
 }
-.container { max-width: 960px; margin: 0 auto; padding: 20px; }
-header { text-align: center; margin-bottom: 28px; }
-h1 {
-  font-size: 2.2rem;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.topbar-inner {
+  max-width: 1080px; margin: 0 auto; width: 100%;
+  padding: 0 20px; display: flex; align-items: center; justify-content: space-between;
 }
-.subtitle { color: var(--muted); margin-top: 4px; font-size: 0.95rem; }
+.brand { display: flex; align-items: baseline; gap: 10px; text-decoration: none; color: var(--navy); }
+.brand .logo { font-size: 1.55rem; letter-spacing: .5px; }
+.brand .dot { color: var(--peach); font-size: 1.5rem; }
+.tagline { color: var(--muted); font-size: .8rem; }
+
+.container { max-width: 1080px; margin: 0 auto; padding: 24px 20px 96px; }
+.hero { margin: 8px 0 22px; }
+.hero h1 { font-size: clamp(1.9rem, 4.5vw, 2.8rem); color: var(--navy); line-height: 1.15; }
+.hero .sub { color: var(--muted); margin-top: 6px; font-size: 1.02rem; max-width: 62ch; }
+
 .search-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 24px;
-  margin-bottom: 24px;
+  background: #fff; border: 1px solid var(--line);
+  border-radius: var(--radius); box-shadow: var(--shadow-1); padding: 18px;
 }
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+@media (max-width: 640px) {
+  .row, .row3 { grid-template-columns: 1fr; }
+  .container { padding: 18px 14px 96px; }
 }
-.form-group { display: flex; flex-direction: column; }
-.form-group label {
-  font-size: 0.8rem;
-  color: var(--muted);
-  margin-bottom: 5px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.field { position: relative; }
+.field label {
+  display: block; font-size: .72rem; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 6px;
 }
-.form-group input, .form-group select {
-  background: #0d0d14;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 12px;
-  color: var(--text);
-  font-size: 0.95rem;
-  outline: none;
-  transition: border-color 0.2s;
+.field input, .field select {
+  width: 100%; height: var(--tap);
+  border: 1.5px solid var(--line); border-radius: var(--radius-sm);
+  background: var(--surface); color: var(--ink);
+  font: inherit; font-size: 1rem; padding: 0 40px 0 12px;
+  transition: border-color .15s, box-shadow .15s;
+  -webkit-appearance: none; appearance: none;
 }
-.form-group input:focus, .form-group select:focus { border-color: var(--accent); }
-.form-group input::placeholder { color: #555568; }
+.field input:focus, .field select:focus {
+  outline: none; border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(6,147,227,.14); background: #fff;
+}
+.field .icon {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  font-size: 1rem; color: var(--muted); pointer-events: none;
+}
+.clear-btn {
+  position: absolute; right: 34px; top: 50%; transform: translateY(-50%);
+  width: 22px; height: 22px; border: 0; border-radius: 50%;
+  background: var(--line); color: #fff; font-size: 12px;
+  cursor: pointer; display: none; align-items: center; justify-content: center;
+}
+.clear-btn.show { display: flex; }
+
+.pop {
+  position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+  background: #fff; border: 1px solid var(--line);
+  border-radius: var(--radius-sm); box-shadow: var(--shadow-2);
+  max-height: 320px; overflow-y: auto; z-index: 60; display: none;
+  overscroll-behavior: contain;
+}
+.pop.open { display: block; }
+.pop .group-label {
+  position: sticky; top: 0; background: var(--surface-2);
+  padding: 6px 12px 4px; font-size: .68rem; font-weight: 700;
+  letter-spacing: .07em; text-transform: uppercase; color: var(--muted);
+  border-bottom: 1px solid var(--line); z-index: 2;
+}
+.pop .opt {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 12px; cursor: pointer; border-bottom: 1px solid #f0f0f0;
+  min-height: var(--tap);
+}
+.pop .opt:last-child { border-bottom: 0; }
+.pop .opt:hover, .pop .opt.active { background: var(--surface-2); }
+.pop .badge {
+  flex-shrink: 0; width: 44px; text-align: center;
+  font-weight: 700; font-size: .82rem;
+  background: var(--surface-2); border: 1px solid var(--line);
+  border-radius: 8px; padding: 3px 0; color: var(--navy);
+}
+.pop .badge.airport { background: #e8f4fd; border-color: #bfe3f7; color: #0369a1; }
+.pop .badge.station { background: #eef7ee; border-color: #cdeccd; color: #1a7f37; }
+.pop .badge.port { background: #f3f0ff; border-color: #ddd6fe; color: #5b21b6; }
+.pop .badge.metro { background: var(--navy); border-color: var(--navy); color: #fff; }
+.pop .opt .txt { flex: 1; min-width: 0; }
+.pop .opt .nm { font-weight: 600; font-size: .95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pop .opt .meta { font-size: .78rem; color: var(--muted); }
+.pop .hint { padding: 10px 12px; font-size: .8rem; color: var(--muted); }
+
+.dp {
+  position: absolute; top: calc(100% + 6px); left: 0; z-index: 70;
+  width: 322px; max-width: calc(100vw - 28px);
+  background: #fff; border: 1px solid var(--line);
+  border-radius: var(--radius); box-shadow: var(--shadow-2);
+  padding: 12px; display: none;
+}
+.dp.open { display: block; }
+.dp-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.dp-title { font-size: 1.05rem; color: var(--navy); }
+.dp-nav { display: flex; gap: 4px; }
+.dp-nav button, .dp-quick button {
+  border: 1px solid var(--line); background: var(--surface);
+  border-radius: 8px; cursor: pointer; color: var(--navy);
+}
+.dp-nav button { width: 32px; height: 32px; font-size: 1rem; }
+.dp-nav button:hover, .dp-quick button:hover { background: var(--peach-soft); border-color: var(--peach); }
+.dp-quick { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+.dp-quick button { padding: 5px 10px; font-size: .76rem; font-weight: 600; }
+.dp-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.dp-dow { text-align: center; font-size: .66rem; font-weight: 700; color: var(--muted); padding: 4px 0; text-transform: uppercase; }
+.dp-day {
+  height: 38px; border: 0; background: transparent; border-radius: 9px;
+  font: inherit; font-size: .88rem; cursor: pointer; color: var(--ink);
+  position: relative;
+}
+.dp-day:hover { background: var(--surface-2); }
+.dp-day.other { color: #c4c4c4; pointer-events: none; }
+.dp-day.today::after {
+  content: ''; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%);
+  width: 4px; height: 4px; border-radius: 50%; background: var(--blue);
+}
+.dp-day.sel { background: var(--navy); color: #fff; font-weight: 700; }
+.dp-day.sel::after { background: var(--peach); }
+.dp-day.disabled { color: #d8d8d8; pointer-events: none; }
+.dp-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+.dp-foot .lnk { border: 0; background: none; color: var(--blue); font: inherit; font-size: .82rem; cursor: pointer; padding: 6px 4px; }
+.btn-primary {
+  border: 0; background: var(--navy); color: #fff;
+  font: inherit; font-weight: 700; font-size: .88rem;
+  padding: 9px 16px; border-radius: 9px; cursor: pointer;
+}
+
+.actions { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; align-items: center; }
 .btn-search {
-  grid-column: 1 / -1;
-  margin-top: 8px;
-  padding: 13px;
-  background: linear-gradient(135deg, var(--accent), #5a4bd1);
-  color: white;
-  border: none;
-  border-radius: 10px;
-  font-size: 1.05rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.15s, opacity 0.2s;
+  flex: 1; min-width: 200px; height: 50px;
+  border: 0; border-radius: var(--radius-sm);
+  background: var(--navy); color: #fff;
+  font: inherit; font-weight: 700; font-size: 1.02rem; cursor: pointer;
+  transition: transform .08s, background .15s;
 }
-.btn-search:hover { opacity: 0.92; }
-.btn-search:active { transform: scale(0.98); }
-.btn-search:disabled { opacity: 0.5; cursor: wait; }
-.advanced-toggle {
-  grid-column: 1 / -1;
-  color: var(--accent2);
-  font-size: 0.85rem;
-  cursor: pointer;
-  text-align: right;
-  user-select: none;
+.btn-search:hover { background: #143852; }
+.btn-search:active { transform: scale(.985); }
+.btn-search:disabled { opacity: .55; cursor: wait; }
+.actions .link { border: 0; background: none; color: var(--muted); font: inherit; font-size: .85rem; cursor: pointer; text-decoration: underline; }
+
+.results { margin-top: 22px; }
+.results-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+.results-head h2 { font-size: 1.35rem; color: var(--navy); }
+.results-head .took { color: var(--muted); font-size: .82rem; }
+.skeleton {
+  background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 18px; margin-bottom: 10px; position: relative; overflow: hidden;
 }
-.advanced { display: none; }
-.advanced.show { display: flex; flex-direction: column; gap: 14px; }
-.results { display: flex; flex-direction: column; gap: 14px; }
-.trip-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  transition: border-color 0.2s, transform 0.15s;
+.skeleton::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(6,147,227,.06), transparent);
+  animation: shimmer 1.2s infinite;
 }
-.trip-card:hover { border-color: var(--accent); transform: translateY(-1px); }
-.trip-card.best { border-color: var(--good); box-shadow: 0 0 20px rgba(0,184,148,0.15); }
-.trip-left { flex: 1; }
-.trip-route {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-bottom: 4px;
+@keyframes shimmer { from { transform: translateX(-100%);} to { transform: translateX(100%);} }
+.sk-line { height: 12px; border-radius: 6px; background: var(--surface-2); margin-bottom: 10px; }
+.trip {
+  background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow-1);
+  transition: box-shadow .15s;
 }
-.trip-meta {
-  color: var(--muted);
-  font-size: 0.85rem;
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
+.trip:hover { box-shadow: var(--shadow-2); }
+.trip.best { border-color: var(--peach); border-width: 1.5px; }
+.trip-top { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; flex-wrap: wrap; }
+.score-wrap { display: flex; align-items: center; gap: 10px; }
+.score {
+  width: 52px; height: 52px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 1.05rem; color: var(--navy);
+  background: conic-gradient(var(--peach) calc(var(--p) * 1%), var(--surface-2) 0);
+  position: relative; flex-shrink: 0;
 }
-.trip-tag {
+.score::before { content: ''; position: absolute; inset: 5px; background: #fff; border-radius: 50%; }
+.score span { position: relative; z-index: 1; }
+.best-tag {
   display: inline-block;
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-size: 0.75rem;
-  font-weight: 600;
+  background: var(--peach); color: var(--navy);
+  font-size: .7rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+  padding: 3px 9px; border-radius: 999px; margin-bottom: 2px;
 }
-.tag-flight { background: rgba(108,92,231,0.2); color: var(--accent); }
-.tag-train { background: rgba(0,206,201,0.2); color: var(--accent2); }
-.tag-mixed { background: rgba(253,203,110,0.2); color: var(--warn); }
-.trip-right { text-align: right; margin-left: 16px; }
-.trip-price {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: var(--good);
+.price { font-size: 1.7rem; color: var(--navy); }
+.seg-line { display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; font-size: .9rem; }
+.seg-chip {
+  background: var(--surface-2); border: 1px solid var(--line);
+  padding: 5px 10px; border-radius: 8px; font-size: .82rem;
+  display: inline-flex; gap: 7px; align-items: center;
 }
-.trip-score {
-  font-size: 0.8rem;
-  color: var(--muted);
-  margin-top: 2px;
-}
-.score-bar {
-  width: 60px;
-  height: 5px;
-  background: var(--border);
-  border-radius: 3px;
-  margin-top: 4px;
-  overflow: hidden;
-}
-.score-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--accent), var(--good));
-  border-radius: 3px;
+.seg-chip .t { color: var(--muted); font-size: .8rem; }
+.src-tag {
+  font-size: .68rem; font-weight: 700; letter-spacing: .05em;
+  color: var(--muted); background: var(--surface-2);
+  border-radius: 6px; padding: 2px 7px; text-transform: uppercase;
 }
 .book-btn {
-  display: inline-block;
-  margin-top: 6px;
-  padding: 6px 14px;
-  background: var(--accent);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  text-decoration: none;
-  cursor: pointer;
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 1.5px solid var(--navy); color: var(--navy); background: #fff;
+  font-weight: 700; font-size: .88rem; padding: 8px 16px;
+  border-radius: 9px; cursor: pointer; text-decoration: none;
 }
-.book-btn:hover { opacity: 0.88; }
-.loading {
-  text-align: center;
-  padding: 40px;
-  color: var(--muted);
+.book-btn:hover { background: var(--navy); color: #fff; }
+.trip-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; flex-wrap: wrap; gap: 8px; }
+.empty {
+  background: var(--surface); border: 1px dashed var(--line);
+  border-radius: var(--radius); padding: 28px; text-align: center; color: var(--muted);
 }
-.spinner {
-  display: inline-block;
-  width: 32px;
-  height: 32px;
-  border: 3px solid var(--border);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+.error-box {
+  background: #fdf2f2; border: 1px solid #fecaca; color: #7f1d1d;
+  border-radius: var(--radius); padding: 16px; font-size: .9rem;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
-.empty { text-align: center; color: var(--muted); padding: 40px; }
-.error {
-  text-align: center;
-  color: var(--bad);
-  padding: 20px;
-  background: rgba(225,112,85,0.1);
-  border-radius: 10px;
+footer {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: rgba(255,255,255,.94); backdrop-filter: blur(10px);
+  border-top: 1px solid var(--line);
+  padding: 10px 20px calc(10px + env(safe-area-inset-bottom, 0px));
+  display: flex; justify-content: center; gap: 18px;
+  font-size: .78rem; color: var(--muted); z-index: 50;
 }
-.badge-best {
-  display: inline-block;
-  background: var(--good);
-  color: #fff;
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  margin-bottom: 4px;
+footer a { color: var(--navy); text-decoration: none; font-weight: 600; }
+footer .sep { color: var(--line); }
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
 }
-@media (max-width: 600px) {
-  .form-grid { grid-template-columns: 1fr; }
-  .trip-card { flex-direction: column; align-items: flex-start; gap: 12px; }
-  .trip-right { text-align: left; margin-left: 0; }
-}
-.suggest {
-  position: relative;
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.2s;
-}
-.suggest.show { max-height: 200px; overflow-y: auto; }
-.suggest-item {
-  padding: 8px 12px;
-  background: #0d0d14;
-  border: 1px solid var(--border);
-  border-top: none;
-  cursor: pointer;
-  font-size: 0.85rem;
-  border-radius: 0 0 6px 6px;
-}
-.suggest-item:hover { background: var(--accent); color: white; }
-.suggest-item .code { font-weight: 700; color: var(--accent2); margin-right: 8px; }
-.suggest-item:hover .code { color: white; }
 </style>
 </head>
 <body>
-<div class="container">
-  <header>
-    <h1>🌍 Wanderer</h1>
-    <p class="subtitle">Ricerca itinerari reali — volo e treno, con Wander Score</p>
-  </header>
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="/">
+      <span class="logo">Wanderer</span><span class="dot">.</span>
+      <span class="tagline">itinerari con budget</span>
+    </a>
+  </div>
+</header>
 
-  <div class="search-card">
-    <div class="form-grid">
-      <div class="form-group">
-        <label>Origine (IATA)</label>
-        <input type="text" id="origin" placeholder="es. MIL (Milano)" autocomplete="off" oninput="suggestCity(this,'origin-suggest')">
-        <div class="suggest" id="origin-suggest"></div>
-      </div>
-      <div class="form-group">
-        <label>Destinazione (IATA)</label>
-        <input type="text" id="destination" placeholder="es. PAR (Parigi)" autocomplete="off" oninput="suggestCity(this,'dest-suggest')">
-        <div class="suggest" id="dest-suggest"></div>
-      </div>
-      <div class="form-group">
-        <label>Data andata</label>
-        <input type="date" id="date">
-      </div>
-      <div class="form-group">
-        <label>Data ritorno (opz.)</label>
-        <input type="date" id="return_date">
-      </div>
-      <div class="advanced-toggle" onclick="toggleAdvanced()">⚙️ Filtri avanzati</div>
-      <div class="advanced" id="advanced">
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Prezzo max (EUR)</label>
-            <input type="number" id="max_price" placeholder="500">
-          </div>
-          <div class="form-group">
-            <label>Durata max (ore)</label>
-            <input type="number" id="max_duration_h" placeholder="10">
-          </div>
-          <div class="form-group">
-            <label>Partenza min</label>
-            <input type="time" id="earliest_depart">
-          </div>
-          <div class="form-group">
-            <label>Partenza max</label>
-            <input type="time" id="latest_depart">
-          </div>
-          <div class="form-group">
-            <label>Trasporto preferito</label>
-            <select id="preferred_transport">
-              <option value="">Qualsiasi</option>
-              <option value="flight">Solo volo</option>
-              <option value="train">Solo treno</option>
-              <option value="mixed">Misto</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Passeggeri</label>
-            <input type="number" id="adults" value="1" min="1">
-          </div>
-        </div>
-      </div>
-      <button class="btn-search" id="searchBtn" onclick="doSearch()">🔍 Cerca itinerari</button>
-    </div>
+<div class="container">
+  <div class="hero">
+    <h1>Dove vuoi andare?</h1>
+    <div class="sub">Voli, treni e traghetti in un'unica ricerca, ordinati dal <b>Wander Score</b>: il miglior compromesso tra prezzo, durata e orari.</div>
   </div>
 
-  <div id="results"></div>
+  <form class="search-card" id="searchForm" autocomplete="off">
+    <div class="row">
+      <div class="field">
+        <label for="origin">Da</label>
+        <input type="text" id="origin" placeholder="Città, aeroporto, stazione…" required>
+        <button type="button" class="clear-btn" id="originClear" aria-label="Cancella">✕</button>
+        <div class="pop" id="originPop"></div>
+      </div>
+      <div class="field">
+        <label for="destination">A</label>
+        <input type="text" id="destination" placeholder="Dove vuoi arrivare…" required>
+        <button type="button" class="clear-btn" id="destClear" aria-label="Cancella">✕</button>
+        <div class="pop" id="destPop"></div>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:12px">
+      <div class="field">
+        <label for="date">Andata</label>
+        <input type="text" id="date" inputmode="none" readonly placeholder="Scegli data" required>
+        <span class="icon">📅</span>
+        <div class="dp" id="dateDp"></div>
+      </div>
+      <div class="field">
+        <label for="return_date">Ritorno (opzionale)</label>
+        <input type="text" id="return_date" inputmode="none" readonly placeholder="Solo andata">
+        <span class="icon">📅</span>
+        <div class="dp" id="retDp"></div>
+      </div>
+    </div>
+
+    <div class="row3" style="margin-top:12px">
+      <div class="field">
+        <label for="max_price">Budget max (€)</label>
+        <input type="number" id="max_price" min="1" step="1" inputmode="decimal" placeholder="es. 120">
+        <span class="icon">€</span>
+      </div>
+      <div class="field">
+        <label for="adults">Viaggiatori</label>
+        <select id="adults">
+          <option value="1">1 adulto</option>
+          <option value="2">2 adulti</option>
+          <option value="3">3 adulti</option>
+          <option value="4">4 adulti</option>
+        </select>
+        <span class="icon">👤</span>
+      </div>
+      <div class="field">
+        <label for="preferred_transport">Mezzo</label>
+        <select id="preferred_transport">
+          <option value="">Tutti</option>
+          <option value="flight">Solo voli</option>
+          <option value="train">Solo treni</option>
+        </select>
+        <span class="icon">🚄</span>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button type="submit" class="btn-search" id="btnSearch">🔍&nbsp; Cerca itinerari</button>
+      <button type="button" class="link" id="swapBtn">⇄ Inverti</button>
+      <button type="button" class="link" id="resetBtn">Azzera</button>
+    </div>
+  </form>
+
+  <section class="results" id="results" hidden></section>
 </div>
 
+<footer>
+  <span>Wanderer</span><span class="sep">·</span>
+  <a href="https://leowander.com" target="_blank" rel="noopener">Leo Wander</a><span class="sep">·</span>
+  <span id="ft-health">—</span>
+</footer>
+
 <script>
-function toggleAdvanced() {
-  document.getElementById('advanced').classList.toggle('show');
+'use strict';
+// ── Wanderer UI — allineata a Leo Wander ──
+// Target perf: autocomplete <10ms percepito (debounce 120ms, cache), picker 1 frame,
+// skeleton immediato, TTFB statico <300ms.
+
+const $ = id => document.getElementById(id);
+const ui = {
+  origin: $('origin'), dest: $('destination'),
+  date: $('date'), ret: $('return_date'),
+  originPop: $('originPop'), destPop: $('destPop'),
+  originClear: $('originClear'), destClear: $('destClear'),
+  dateDp: $('dateDp'), retDp: $('retDp'),
+  form: $('searchForm'), btn: $('btnSearch'), results: $('results'),
+  maxPrice: $('max_price'), adults: $('adults'), transport: $('preferred_transport'),
+};
+const state = { origin: null, dest: null, date: null, ret: null };
+const KIND_IT = { metro: 'Tutti i mezzi', airport: 'Aeroporto', station: 'Stazione', port: 'Porto' };
+
+function debounce(fn, ms) { let t; return function(...a) { clearTimeout(t); const f = () => fn.apply(this, a); t = setTimeout(f, ms); }; }
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+}
+function money(v, cur) {
+  try { return new Intl.NumberFormat('it-IT', { style: 'currency', currency: cur || 'EUR', maximumFractionDigits: v >= 1000 ? 0 : 2 }).format(v); }
+  catch (e) { return v + ' ' + (cur || ''); }
+}
+function fmtDur(m) { const h = Math.floor(m / 60); return h ? h + 'h' + (m % 60 ? ' ' + (m % 60) + 'm' : '') : m + 'm'; }
+function fmtDateTime(s) {
+  if (!s) return '';
+  const d = new Date(s);
+  return d.toLocaleString('it-IT', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 }
 
-// Autocomplete città/aeroporti
-let suggestTimer = null;
-function suggestCity(input, suggestId) {
-  clearTimeout(suggestTimer);
-  const q = input.value.trim();
-  const div = document.getElementById(suggestId);
-  if (q.length < 2) { div.classList.remove('show'); div.innerHTML = ''; return; }
-  suggestTimer = setTimeout(async () => {
-    try {
-      const resp = await fetch('/api/cities?q=' + encodeURIComponent(q));
-      const data = await resp.json();
-      div.innerHTML = '';
-      (data.cities || []).forEach(c => {
-        const item = document.createElement('div');
-        item.className = 'suggest-item';
-        item.innerHTML = '<span class="code">' + c.code + '</span>' + c.name + ' <small style="color:var(--muted)">' + c.country + '</small>';
-        item.onclick = () => {
-          input.value = c.code;
-          div.classList.remove('show');
-          div.innerHTML = '';
-        };
-        div.appendChild(item);
-      });
-      if (div.children.length > 0) div.classList.add('show');
-      else div.classList.remove('show');
-    } catch(e) { /* silent */ }
-  }, 200);
-}
+// ═══════════ Autocomplete luoghi ══════════
+let activeIdx = -1;
 
-async function doSearch() {
-  const btn = document.getElementById('searchBtn');
-  const resultsDiv = document.getElementById('results');
-  btn.disabled = true;
-  btn.textContent = '⏳ Ricerca in corso...';
-  resultsDiv.innerHTML = '<div class="loading"><div class="spinner"></div><p style="margin-top:12px">Interrogando provider...</p></div>';
-
-  const params = new URLSearchParams();
-  const fields = ['origin','destination','date','return_date','max_price','max_duration_h','earliest_depart','latest_depart','preferred_transport','adults'];
-  fields.forEach(f => {
-    const el = document.getElementById(f);
-    if (el && el.value) params.set(f, el.value);
-  });
-
-  try {
-    const resp = await fetch('/api/search?' + params.toString());
-    const data = await resp.json();
-    if (data.error) {
-      resultsDiv.innerHTML = '<div class="error">❌ ' + data.error + '</div>';
-      return;
-    }
-    renderResults(data);
-  } catch (e) {
-    resultsDiv.innerHTML = '<div class="error">❌ Errore: ' + e.message + '</div>';
-  } finally {
-    btn.disabled = false;
-    btn.textContent = '🔍 Cerca itinerari';
+function closePops(except) {
+  for (const p of [ui.originPop, ui.destPop, ui.dateDp, ui.retDp]) {
+    if (p !== except) p.classList.remove('open');
   }
 }
 
-function renderResults(data) {
-  const div = document.getElementById('results');
-  if (!data.trips || data.trips.length === 0) {
-    div.innerHTML = '<div class="empty">Nessun itinerario trovato. Prova a allargare i filtri.</div>';
+function pickPlace(input, pop, p, isOrigin) {
+  input.value = p.name;
+  if (isOrigin) state.origin = p; else state.dest = p;
+  pop.classList.remove('open');
+  activeIdx = -1;
+  // coerenza: se la destinazione scelta prima non è compatibile con il nuovo mezzo, la azzero
+  if (isOrigin && p.kind !== 'metro' && state.dest && state.dest.kind !== p.kind && state.dest.kind !== 'metro') {
+    state.dest = null;
+    ui.dest.value = '';
+  }
+  if (isOrigin && p.kind !== 'metro') {
+    // apre subito il campo destinazione con il filtro giusto
+    setTimeout(() => { ui.dest.focus(); }, 80);
+  }
+}
+
+function renderPlaces(pop, places) {
+  pop.innerHTML = '';
+  if (!places.length) {
+    pop.innerHTML = '<div class="hint">Nessun luogo trovato — prova con la sola città (es. “Milano”).</div>';
+    pop.classList.add('open');
     return;
   }
-
-  let html = '<div class="results">';
-  data.trips.forEach((trip, i) => {
-    const route = trip.segments.map(s => s.from_name || s.from_code).join(' → ') +
-      ' → ' + (trip.segments[trip.segments.length-1]?.to_name || trip.segments[trip.segments.length-1]?.to_code);
-    const depTime = trip.segments[0]?.departure?.substring(11,16) || '';
-    const arrTime = trip.segments[trip.segments.length-1]?.arrival?.substring(11,16) || '';
-    const durH = Math.floor(trip.total_duration_min / 60);
-    const durM = trip.total_duration_min % 60;
-    const transportTags = trip.transport_types.map(t => {
-      const labels = {flight:'✈️ Volo', train:'🚆 Treno', mixed:'🔄 Misto'};
-      return '<span class="trip-tag tag-'+t+'">'+(labels[t]||t)+'</span>';
-    }).join(' ');
-
-    const scorePct = Math.round(trip.score);
-    const isBest = i === 0 && trip.rank === 1;
-
-    html += '<div class="trip-card'+(isBest?' best':'')+'">'+
-      '<div class="trip-left">'+
-        (isBest ? '<div class="badge-best">⭐ MIGLIORE</div>' : '')+
-        '<div class="trip-route">'+route+'</div>'+
-        '<div class="trip-meta">'+
-          '<span>⏰ '+depTime+' → '+arrTime+'</span>'+
-          '<span>⏱️ '+durH+'h '+durM+'m</span>'+
-          '<span>'+transportTags+'</span>'+
-          '<span>📡 '+trip.source+'</span>'+
-        '</div>'+
-      '</div>'+
-      '<div class="trip-right">'+
-        '<div class="trip-price">'+trip.currency+' '+trip.total_price.toFixed(0)+'</div>'+
-        '<div class="trip-score">Wander Score: '+scorePct+'/100 (#'+trip.rank+')</div>'+
-        '<div class="score-bar"><div class="score-fill" style="width:'+scorePct+'%"></div></div>'+
-        '<a href="'+(trip.booking_url||'#')+'" target="_blank" class="book-btn">Prenota →</a>'+
-      '</div>'+
-    '</div>';
-  });
-  html += '</div>';
-
-  // Stats footer
-  html += '<p style="text-align:center;color:var(--muted);margin-top:16px;font-size:0.8rem">'+
-    data.count+' itinerari | Provider: '+(data.providers_queried||[]).join(', ')+
-    ' | '+(data.took_ms/1000).toFixed(2)+'s</p>';
-
-  div.innerHTML = html;
+  let lastGroup = null;
+  for (const p of places) {
+    const group = (p.country || '') + '|' + (p.metro || p.code);
+    if (p.metro && group !== lastGroup) {
+      lastGroup = group;
+      const gl = document.createElement('div');
+      gl.className = 'group-label';
+      gl.textContent = p.country + ' · ' + p.metro.toUpperCase();
+      pop.appendChild(gl);
+    }
+    const row = document.createElement('div');
+    row.className = 'opt';
+    row.dataset.code = p.code; row.dataset.name = p.name; row.dataset.kind = p.kind;
+    const badgeTxt = p.kind === 'metro' ? '★' : p.code;
+    row.innerHTML = '<span class="badge ' + p.kind + '">' + badgeTxt + '</span>' +
+      '<span class="txt"><span class="nm">' + escapeHtml(p.name) + '</span>' +
+      '<div class="meta">' + (KIND_IT[p.kind] || p.kind) + ' · ' + escapeHtml(p.country) + '</div></span>';
+    row.addEventListener('mousedown', e => e.preventDefault());
+    row.addEventListener('click', () => pickPlace(pop === ui.originPop ? ui.origin : ui.dest, pop, p, pop === ui.originPop));
+    pop.appendChild(row);
+  }
+  pop.classList.add('open');
 }
+
+async function fetchPlaces(q, from) {
+  const u = new URL('/api/places', location.origin);
+  u.searchParams.set('q', q);
+  if (from) u.searchParams.set('from', from);
+  u.searchParams.set('limit', '40');
+  const r = await fetch(u);
+  return r.json();
+}
+
+function wirePlaceInput(input, pop, clearBtn, isOrigin) {
+  const run = debounce(async () => {
+    const q = input.value.trim();
+    clearBtn.classList.toggle('show', q.length > 0);
+    if (q.length < 2) { pop.classList.remove('open'); return; }
+    const from = isOrigin ? '' : (state.origin ? state.origin.code : '');
+    try {
+      const data = await fetchPlaces(q, from);
+      renderPlaces(pop, data.places || []);
+      activeIdx = -1;
+    } catch (e) { /* silenzioso */ }
+  }, 120);
+  input.addEventListener('input', run);
+  input.addEventListener('focus', run);
+  input.addEventListener('blur', () => setTimeout(() => pop.classList.remove('open'), 160));
+  input.addEventListener('keydown', e => {
+    const opts = pop.querySelectorAll('.opt');
+    if (!opts.length) return;
+    if (e.key === 'ArrowDown') {
+      activeIdx = Math.min(activeIdx + 1, opts.length - 1);
+      opts.forEach((o, i) => o.classList.toggle('active', i === activeIdx));
+      if (opts[activeIdx]) opts[activeIdx].scrollIntoView({ block: 'nearest' });
+      e.preventDefault();
+    } else if (e.key === 'ArrowUp') {
+      activeIdx = Math.max(activeIdx - 1, -1);
+      opts.forEach((o, i) => o.classList.toggle('active', i === activeIdx));
+      e.preventDefault();
+    } else if (e.key === 'Enter' && activeIdx >= 0 && opts[activeIdx]) {
+      e.preventDefault();
+      opts[activeIdx].click();
+    } else if (e.key === 'Escape') {
+      pop.classList.remove('open'); input.blur();
+    }
+  });
+  clearBtn.addEventListener('click', () => {
+    input.value = ''; clearBtn.classList.remove('show');
+    if (isOrigin) state.origin = null; else state.dest = null;
+    input.focus();
+  });
+}
+wirePlaceInput(ui.origin, ui.originPop, ui.originClear, true);
+wirePlaceInput(ui.dest, ui.destPop, ui.destClear, false);
+
+// ═══════════ Date picker ══════════
+const MONTHS_IT = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+const DOW_IT = ['L','M','M','G','V','S','D'];
+const today = new Date(); today.setHours(0,0,0,0);
+let viewY = today.getFullYear(), viewM = today.getMonth();
+
+function iso(d) {
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function fmtDateHuman(d) {
+  return d.toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+}
+function fmtIsoHuman(s) {
+  if (!s) return '';
+  return fmtDateHuman(new Date(s + 'T12:00:00'));
+}
+
+function renderPicker(cont) {
+  const which = pickerWhich(cont);
+  const sel = which === 'date' ? state.date : state.ret;
+  cont.innerHTML = '';
+  const head = document.createElement('div');
+  head.className = 'dp-head';
+  head.innerHTML = '<button type="button" data-nav="-1" aria-label="Mese precedente">‹</button>' +
+    '<div class="dp-title">' + MONTHS_IT[viewM] + ' ' + viewY + '</div>' +
+    '<span style="display:flex;gap:4px">' +
+    '<button type="button" data-nav="-12" aria-label="Anno precedente">«</button>' +
+    '<button type="button" data-nav="12" aria-label="Anno successivo">»</button>' +
+    '<button type="button" data-nav="1" aria-label="Mese successivo">›</button></span>';
+  const quick = document.createElement('div');
+  quick.className = 'dp-quick';
+  quick.innerHTML = '<button type="button" data-jump="today">Oggi</button>' +
+    '<button type="button" data-jump="tomorrow">Domani</button>' +
+    '<button type="button" data-jump="w">+7g</button>' +
+    '<button type="button" data-jump="m">+30g</button>' +
+    '<button type="button" data-jump="weekend">Weekend</button>';
+  const grid = document.createElement('div');
+  grid.className = 'dp-grid';
+  for (const d of DOW_IT) {
+    const dw = document.createElement('span');
+    dw.className = 'dp-dow';
+    dw.textContent = d;
+    grid.appendChild(dw);
+  }
+  cont.append(head, quick, grid);
+  const first = new Date(viewY, viewM, 1);
+  const lead = (first.getDay() + 6) % 7;
+  const dim = new Date(viewY, viewM + 1, 0).getDate();
+  for (let i = 0; i < lead; i++) {
+    const s = document.createElement('span');
+    s.className = 'dp-day other';
+    grid.appendChild(s);
+  }
+  for (let d = 1; d <= dim; d++) {
+    const dt = new Date(viewY, viewM, d);
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'dp-day';
+    b.textContent = String(d);
+    if (iso(dt) === iso(today)) b.classList.add('today');
+    if (sel && iso(dt) === sel) b.classList.add('sel');
+    if (dt < today) b.classList.add('disabled');
+    b.addEventListener('click', () => {
+      if (which === 'date') { state.date = iso(dt); ui.date.value = fmtDateHuman(dt); }
+      else { state.ret = iso(dt); ui.ret.value = fmtDateHuman(dt); }
+      cont.classList.remove('open');
+    });
+    grid.appendChild(b);
+  }
+  const foot = document.createElement('div');
+  foot.className = 'dp-foot';
+  foot.innerHTML = '<button type="button" class="lnk" data-clear="1">Azzera</button>' +
+    '<button type="button" class="btn-primary" data-close="1">OK</button>';
+  cont.appendChild(foot);
+}
+
+function pickerWhich(cont) { return cont === ui.dateDp ? 'date' : 'ret'; }
+
+function openPicker(cont) {
+  const cur = pickerWhich(cont) === 'date' ? state.date : state.ret;
+  const base = cur ? new Date(cur + 'T12:00:00') : today;
+  viewY = base.getFullYear(); viewM = base.getMonth();
+  closePops(cont);
+  renderPicker(cont);
+  cont.classList.add('open');
+}
+
+for (const cont of [ui.dateDp, ui.retDp]) {
+  const input = cont === ui.dateDp ? ui.date : ui.ret;
+  input.addEventListener('click', () => openPicker(cont));
+  input.addEventListener('focus', () => openPicker(cont));
+  input.addEventListener('blur', () => setTimeout(() => cont.classList.remove('open'), 160));
+  cont.addEventListener('click', e => {
+    const t = e.target.closest('button');
+    if (!t) return;
+    if (t.dataset.nav !== undefined) {
+      const n = Number(t.dataset.nav);
+      viewM += n;
+      while (viewM < 0) { viewM += 12; viewY--; }
+      while (viewM > 11) { viewM -= 12; viewY++; }
+      renderPicker(cont);
+    } else if (t.dataset.jump) {
+      const d = new Date(today);
+      const j = t.dataset.jump;
+      if (j === 'tomorrow') d.setDate(d.getDate() + 1);
+      else if (j === 'w') d.setDate(d.getDate() + 7);
+      else if (j === 'm') d.setMonth(d.getMonth() + 1);
+      else if (j === 'weekend') { while (d.getDay() !== 5) d.setDate(d.getDate() + 1); } // prossimo venerdì
+      if (pickerWhich(cont) === 'date') { state.date = iso(d); ui.date.value = fmtDateHuman(d); }
+      else { state.ret = iso(d); ui.ret.value = fmtDateHuman(d); }
+      cont.classList.remove('open');
+    } else if (t.dataset.clear !== undefined) {
+      if (pickerWhich(cont) === 'date') { state.date = null; ui.date.value = ''; }
+      else { state.ret = null; ui.ret.value = ''; }
+      renderPicker(cont);
+    } else if (t.dataset.close !== undefined) {
+      cont.classList.remove('open');
+    }
+  });
+}
+
+// click fuori chiude tutto
+document.addEventListener('click', e => {
+  if (!e.target.closest('.field')) closePops(null);
+});
+
+// ═══════════ Swap / reset ══════════
+$('swapBtn').addEventListener('click', () => {
+  const ov = ui.origin.value, os = state.origin;
+  ui.origin.value = ui.dest.value; state.origin = state.dest;
+  ui.dest.value = ov; state.dest = os;
+  if (state.origin && state.origin.kind !== 'metro') {
+    // riallineo coerenza destinazione
+    if (state.dest && state.dest.kind !== state.origin.kind && state.dest.kind !== 'metro') { state.dest = null; ui.dest.value = ''; }
+  }
+});
+$('resetBtn').addEventListener('click', () => {
+  ui.form.reset();
+  state.origin = null; state.dest = null; state.date = null; state.ret = null;
+  ui.originClear.classList.remove('show'); ui.destClear.classList.remove('show');
+  ui.results.hidden = true;
+});
+
+// ═══════════ Ricerca ══════════
+let searching = false;
+ui.form.addEventListener('submit', async e => {
+  e.preventDefault();
+  if (searching) return;
+  if (!state.origin || !state.dest || !state.date) {
+    alert('Scegli partenza, destinazione e data di andata.');
+    return;
+  }
+  searching = true;
+  ui.btn.disabled = true;
+  ui.results.hidden = false;
+  ui.results.innerHTML = '<div class="results-head"><h2>Ricerca in corso…</h2></div>' +
+    '<div class="skeleton"><div class="sk-line" style="width:40%"></div><div class="sk-line" style="width:70%"></div><div class="sk-line" style="width:55%"></div></div>'.repeat(3);
+  ui.results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const t0 = performance.now();
+  try {
+    const payload = {
+      origin: state.origin.code,
+      destination: state.dest.code,
+      date: state.date,
+      return_date: state.ret || '',
+      adults: Number(ui.adults.value) || 1,
+      max_price: Number(ui.maxPrice.value) || 0,
+      preferred_transport: ui.transport.value || ''
+    };
+    const r = await fetch('/api/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Errore nella ricerca');
+    renderResults(d);
+  } catch (err) {
+    ui.results.innerHTML = '<div class="error-box">⚠️ ' + escapeHtml(err.message || 'Errore di rete — riprova.') + '</div>';
+  } finally {
+    searching = false; ui.btn.disabled = false;
+  }
+});
+
+function renderResults(d) {
+  const trips = d.trips || [];
+  if (!trips.length) {
+    ui.results.innerHTML = '<div class="results-head"><h2>Nessun risultato</h2></div>' +
+      '<div class="empty">Prova ad allargare il budget, cambiare data o mezzo.</div>';
+    return;
+  }
+  const head = '<div class="results-head"><h2>' + trips.length + ' itinerari</h2>' +
+    '<span class="took">' + Math.round(d.took_ms || 0) + ' ms · ' + (d.providers_queried || []).join(' · ') + '</span></div>';
+  ui.results.innerHTML = head + trips.map((t, i) => tripCard(t, i === 0)).join('');
+}
+
+function tripCard(t, isBest) {
+  const segs = t.segments || [];
+  const first = segs[0] || {};
+  const last = segs[segs.length - 1] || first;
+  const icons = Array.from(new Set(segs.map(s => s.type)))
+    .map(ty => ty === 'flight' ? '✈️' : ty === 'train' ? '🚆' : '⛴️').join(' ');
+  return '<article class="trip ' + (isBest ? 'best' : '') + '">' +
+    '<div class="trip-top">' +
+      '<div class="score-wrap">' +
+        '<div class="score" style="--p:' + Math.round(t.score) + '"><span>' + Math.round(t.score) + '</span></div>' +
+        '<div><div style="font-weight:600">' + escapeHtml(first.carrier || t.source) + '</div>' +
+        '<div style="font-size:.78rem;color:var(--muted)">' + icons + ' ' + fmtDur(t.total_duration_min) + ' · ' + segs.length + ' tratta' + (segs.length > 1 ? 'e' : '') + '</div></div>' +
+      '</div>' +
+      '<div style="text-align:right">' +
+        (isBest ? '<span class="best-tag">★ Migliore</span><br>' : '') +
+        '<div class="price">' + money(t.total_price, t.currency) + '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="seg-line">' +
+      '<span class="seg-chip"><b>' + escapeHtml(first.from_code || '') + ' → ' + escapeHtml(last.to_code || '') + '</b></span>' +
+      '<span class="seg-chip"><span class="t">parte</span> ' + fmtDateTime(first.departure) + '</span>' +
+      '<span class="seg-chip"><span class="t">arriva</span> ' + fmtDateTime(last.arrival) + '</span>' +
+      '<span class="src-tag">' + escapeHtml(t.source) + '</span>' +
+    '</div>' +
+    '<div class="trip-foot">' +
+      '<span style="font-size:.78rem;color:var(--muted)">' + escapeHtml(t.notes || '') + '</span>' +
+      '<a class="book-btn" href="' + escapeHtml(t.booking_url || '#') + '" target="_blank" rel="noopener">Prenota ↗</a>' +
+    '</div>' +
+  '</article>';
+}
+
+// health footer
+fetch('/api/health').then(r => r.json()).then(() => { $('ft-health').textContent = 'servizio attivo'; })
+  .catch(() => { $('ft-health').textContent = 'offline'; });
 </script>
 </body>
 </html>
